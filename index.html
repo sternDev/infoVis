@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Benzinpreise - Informationsvisualisierung</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script data-main="js/main" src="js/lib/require.js"></script>
+</head>
+<body>
+<label for="yearSelect">Jahr:</label>
+<select id="yearSelect">
+    <option name="2014">2014</option>
+    <option name="2015">2015</option>
+    <option name="2016">2016</option>
+    <option name="2017">2017</option>
+</select>
+<div id="firstChart"></div>
+
+<script>
+    require(['graph-diagram'], function (graphDiagram) {
+        new graphDiagram();
+    });
+</script>
+</body>
+</html>
