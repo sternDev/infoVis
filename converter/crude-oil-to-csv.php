@@ -15,6 +15,10 @@ $array = $fileLoader->getArray();
 
 $oldYear = null;
 $output = '';
+$fileLoader = new FileLoader('prices.json', 'created/dollar-prices/', 'json');
+$priceArray = $fileLoader->getArray();
+var_dump($priceArray);
+
 foreach($array as $data) {
     $price = $data[1];
 
@@ -23,16 +27,21 @@ foreach($array as $data) {
 
     $price = @($price/158.987294928);
     $date = $data[0];
-    $year = date('Y', strtotime($date));
-    if($year != $oldYear) {
-        if($oldYear != null) {
-            FileSaver::saveFile('crude-oil/crude-oil-' . $oldYear . '.csv', $output);
+
+    if($priceArray[$date] != null) {
+        $price = 1 / $priceArray[$date] * $price;
+
+        $year = date('Y', strtotime($date));
+        if ($year != $oldYear) {
+            if ($oldYear != null) {
+                FileSaver::saveFile('crude-oil/crude-oil-' . $oldYear . '.csv', $output);
+            }
+            $output = "DATE,VALUE\n";
+            $oldYear = $year;
         }
-        $output = "DATE,VALUE\n";
-        $oldYear = $year;
-    }
-    if(isset($price) && $price > 0) {
-        $output .= $date.",".round($price,2)."\n";
+        if (isset($price) && $price > 0) {
+            $output .= $date . "," . round($price, 2) . "\n";
+        }
     }
 }
 

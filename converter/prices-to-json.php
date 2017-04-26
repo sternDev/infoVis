@@ -15,16 +15,20 @@ $array = $fileLoader->getArray();
 
 
 $output = array();
+$outputNew = array();
 foreach($array as $data) {
     $price = $data[1];
     $date = $data[0];
     $year = date('Y', strtotime($date));
     if(isset($price) && $price > 0) {
         $output[$year][$date] = floatval($price);
+        $outputNew[$date] = floatval($price);
     }
 }
 
 
+FileSaver::saveFile('dollar-prices/prices.json', json_encode($outputNew));
+
 foreach($output as $year => $data) {
-    FileSaver::saveFile('dollar-prices/prices-' . $year. '.json', json_encode($data));
+   // FileSaver::saveFile('dollar-prices/prices-' . $year. '.json', json_encode($data));
 }

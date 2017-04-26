@@ -11,10 +11,17 @@ class FileLoader
     private $filename;
     private $data = array();
     private $path = '/../data/external/';
-    private $fileContent ;
+    private $fileContent;
+    private $mode = 'csv';
 
-    public function __construct($filename)
+    public function __construct($filename, $path = null, $mode = null)
     {
+        if ($path != null) {
+            $this->path = '/../data/' . $path;
+        }
+        if ($mode != null) {
+            $this->mode= $mode;
+        }
         $this->filename = $filename;
         $this->loadFile();
     }
@@ -23,20 +30,34 @@ class FileLoader
     {
         $file = dirname(__FILE__) . $this->path . $this->filename;
         $this->fileContent = file_get_contents($file);
-
-        $this->loadCsvToArray();
+        switch ($this->mode) {
+            case'csv':
+                $this->loadCsvToArray();
+                break;
+            case 'json':
+                $this->loadJsonToArray();
+                break;
+        }
     }
 
-    private function loadCsvToArray() {
-
+    private function loadCsvToArray()
+    {
         $this->data = array_map("str_getcsv", explode("\n", $this->fileContent));
     }
 
-    public function getJSON() {
+    public function loadJsonToArray()
+    {
+        $this->data = json_decode($this->fileContent, true);
+    }
+
+
+    public function getJSON()
+    {
         return json_encode($this->data);
     }
 
-    public function getArray() {
+    public function getArray()
+    {
         return $this->data;
     }
 
