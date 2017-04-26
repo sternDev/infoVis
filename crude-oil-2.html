@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <title>Benzinpreise - Informationsvisualisierung</title>
     <link rel="stylesheet" href="css/style2.css">
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="js/lib/jquery-3.2.1.min.js"></script>
+    <script data-main="js/main" src="js/lib/require.js"></script>
 </head>
 <body>
 <h2>Jahr 2014:</h2>
@@ -17,7 +16,20 @@
 <h2>Jahr 2017:</h2>
 <div id="crudeOil2017"></div>
 
-<script src="js/test.js"></script>
+<script>
+    require(['require'], function (require) {
+        require(['graph-chart'], function (GraphChart) {
+            var graphChart14 = new GraphChart(2014);
+            graphChart14.createDiagram();
+            var graphChart15 = new GraphChart(2015);
+            graphChart15.createDiagram();
+            var graphChart16 = new GraphChart(2016);
+            graphChart16.createDiagram();
+            var graphChart17 = new GraphChart(2017);
+            graphChart17.createDiagram();
+        });
+    });
+</script>
 
 </body>
 </html>

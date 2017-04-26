@@ -17,8 +17,15 @@
 <div id="firstChart"></div>
 
 <script>
-    require(['graph-diagram'], function (graphDiagram) {
-        new graphDiagram();
+    require(['require'], function (require) {
+        require(['jquery', 'bar-chart'], function ($, BarChart) {
+            var barChart = new BarChart('firstChart');
+            barChart.createDiagram(2014);
+            $('#yearSelect').change(function () {
+                $("#firstChart").empty();
+                barChart.createDiagram(this.value);
+            });
+        });
     });
 </script>
 </body>
