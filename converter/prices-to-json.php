@@ -20,9 +20,11 @@ foreach($array as $data) {
     $price = $data[1];
     $date = $data[0];
     $year = date('Y', strtotime($date));
-    if(isset($price) && $price > 0) {
-        $output[$year][$date] = floatval($price);
-        $outputNew[$date] = floatval($price);
+    if($year >= 2014) {
+        if (isset($price) && $price > 0) {
+            $output[$year][$date] = floatval($price);
+            $outputNew[$date] = floatval($price);
+        }
     }
 }
 

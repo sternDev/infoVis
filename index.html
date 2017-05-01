@@ -1,30 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <title>Benzinpreise - Informationsvisualisierung</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script data-main="js/main" src="js/lib/require.js"></script>
+    <link rel="stylesheet" href="css/styleCharts.css">
+    <script src="js/lib/require.js"></script>
+    <script src="js/main.js"></script>
 </head>
 <body>
-<label for="yearSelect">Jahr:</label>
-<select id="yearSelect">
-    <option name="2014">2014</option>
-    <option name="2015">2015</option>
-    <option name="2016">2016</option>
-    <option name="2017">2017</option>
-</select>
-<div id="firstChart"></div>
+<h1>Benzinpreise - Informationsvisualisierung</h1>
 
+<nav>
+    <ul>
+        <li><a href="javascript:void(0);" id="priceGraphChart">GraphChart</a></li>
+        <li><a href="javascript:void(0);" id="priceBarChart">BarChart</a></li>
+    </ul>
+</nav>
+
+<div id="mainBlock"></div>
 <script>
-    require(['require'], function (require) {
-        require(['jquery', 'bar-chart'], function ($, BarChart) {
-            var barChart = new BarChart('firstChart');
-            barChart.createDiagram(2014);
-            $('#yearSelect').change(function () {
-                $("#firstChart").empty();
-                barChart.createDiagram(this.value);
-            });
+    require(['jquery', 'main-controller'], function ($, MainController) {
+        $(document).ready(function () {
+            new MainController('mainBlock');
         });
     });
 </script>

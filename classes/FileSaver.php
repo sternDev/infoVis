@@ -8,8 +8,6 @@
  */
 class FileSaver
 {
-    private $filename;
-    private $data = array();
     private static $path = '/../data/created/';
 
     public static function saveFile($filename, $content) {

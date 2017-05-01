@@ -6,17 +6,19 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
 
     var graphChart = function (year) {
         this.svg = null;
-        this.margin = {top: 30, right: 20, bottom: 30, left: 50},
-            this.width = 1000 - this.margin.left - this.margin.right,
-            this.height = 270 - this.margin.top - this.margin.bottom;
+        this.margin = {top: 30, right: 20, bottom: 30, left: 50};
+        this.width = 1000 - this.margin.left - this.margin.right;
+        this.height = 270 - this.margin.top - this.margin.bottom;
 
         this.year = year;
+        this.id = "#crudeOil" + this.year;
+        this.filename = "../data/created/crude-oil/crude-oil-" + this.year + ".csv";
+        $(this.id).empty();
         this.createSvg();
-
     };
 
     graphChart.prototype.createSvg = function () {
-        this.svg = d3.select("#crudeOil" + this.year)
+        this.svg = d3.select(this.id)
             .append("svg")
             .attr("width", this.width + this.margin.left + this.margin.right)
             .attr("height", this.height + this.margin.top + this.margin.bottom)
@@ -26,22 +28,21 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
     };
 
     graphChart.prototype.createDiagram = function () {
-
-// Parse the date / time
+        // Parse the date / time
         var parseDate = d3.time.format("%Y-%m-%d").parse;
 
-// Set the ranges
+        // Set the ranges
         var x = d3.time.scale().range([0, this.width]);
         var y = d3.scale.linear().range([this.height, 0]);
 
-// Define the axes
+        // Define the axes
         var xAxis = d3.svg.axis().scale(x)
             .orient("bottom").ticks(5);
 
         var yAxis = d3.svg.axis().scale(y)
             .orient("left").ticks(5);
 
-// Define the line
+        // Define the line
         var valueline = d3.svg.line()
             .x(function (d) {
                 return x(d.DATE);
@@ -50,10 +51,9 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
                 return y(d.VALUE);
             });
 
-
-// Get the data
+        // Get the data
         var that = this;
-        d3.csv("../data/created/crude-oil/crude-oil-" + this.year + ".csv", function (error, data) {
+        d3.csv(this.filename, function (error, data) {
             data.forEach(function (d) {
                 d.DATE = parseDate(d.DATE);
                 d.VALUE = +d.VALUE;
@@ -90,7 +90,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         var formatDate = d3.time.format("%d.%m.%Y");
 
         // Define the div for the tooltip
-        var div = d3.select("body").append("div")
+        var div = d3.select(this.id).append("div")
             .attr("class", "tooltip")
             .style("opacity", 0);
         // Add the scatterplot
