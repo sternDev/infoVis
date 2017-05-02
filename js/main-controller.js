@@ -41,14 +41,10 @@ define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLo
         templateLoader.setId(this.id);
         templateLoader.loadTemplate(function () {
             require(['graph-chart'], function (GraphChart) {
-                var graphChart14 = new GraphChart(2014);
-                graphChart14.createDiagram();
-                var graphChart15 = new GraphChart(2015);
-                graphChart15.createDiagram();
-                var graphChart16 = new GraphChart(2016);
-                graphChart16.createDiagram();
-                var graphChart17 = new GraphChart(2017);
-                graphChart17.createDiagram();
+                for (var year = 2014; year <= 2017; year++) {
+                    var graphChart = new GraphChart("crudeOil" + year, "../data/created/crude-oil/crude-oil-" + year + ".csv");
+                    graphChart.createDiagram([0, 0.8], 'date');
+                }
             });
         });
     };
@@ -58,9 +54,10 @@ define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLo
         templateLoader.setFilename('prices-crude-oil-diesel.hbs');
         templateLoader.setId(this.id);
         templateLoader.loadTemplate(function () {
-            require(['graph-chart-diesel'], function (GraphChartDiesel) {
-                var graphChart = new GraphChartDiesel(2014);
-                graphChart.createDiagram();
+            require(['graph-chart'], function (GraphChart) {
+                var graphChart = new GraphChart('dieselFlensburg', "/data/created/diesel/diesel.csv");
+                graphChart.setAddPoints(true);
+                graphChart.createDiagram([1000, 1200], 'time');
             });
         });
 
