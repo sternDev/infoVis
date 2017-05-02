@@ -14,6 +14,12 @@ define('main-controller', ['jquery', 'bar-chart', 'template-loader'], function (
             $("#firstChart").empty();
             $this.createBarChartTemplate();
         });
+        $('#priceBarChartNEW').click(function () {
+            $("#firstChart").empty();
+            $this.createGraphChartDiesel();
+        });
+
+
     };
 
     mainController.prototype.createBarChartTemplate = function () {
@@ -40,6 +46,23 @@ define('main-controller', ['jquery', 'bar-chart', 'template-loader'], function (
         templateLoader.setId(this.id);
         templateLoader.loadTemplate();
         require(['graph-chart'], function (GraphChart) {
+            var graphChart14 = new GraphChart(2014);
+            graphChart14.createDiagram();
+            var graphChart15 = new GraphChart(2015);
+            graphChart15.createDiagram();
+            var graphChart16 = new GraphChart(2016);
+            graphChart16.createDiagram();
+            var graphChart17 = new GraphChart(2017);
+            graphChart17.createDiagram();
+        });
+    };
+
+    mainController.prototype.createGraphChartDiesel = function () {
+        var templateLoader = new TemplateLoader();
+        templateLoader.setFilename('prices-crude-oil-diesel.hbs');
+        templateLoader.setId(this.id);
+        templateLoader.loadTemplate();
+        require(['graph-chart-diesel'], function (GraphChart) {
             var graphChart14 = new GraphChart(2014);
             graphChart14.createDiagram();
             var graphChart15 = new GraphChart(2015);
