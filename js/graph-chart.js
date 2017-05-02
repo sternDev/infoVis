@@ -81,8 +81,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
                 .attr("class", "y axis")
                 .call(yAxis);
 
-
-            that.addPoints(data, x, y);
+            //  that.addPoints(data, x, y);
         });
     };
 
@@ -120,5 +119,4 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
     };
 
     return graphChart;
-
 });
