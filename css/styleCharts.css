@@ -46,3 +46,9 @@ svg .pumpkin {
     stroke: orange;
     stroke-width: 5;
 }
+
+/*  Map */
+
+#map {
+    height: 500px;
+}

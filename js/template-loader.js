@@ -25,11 +25,17 @@ define('template-loader', ['jquery', 'handlebars'], function ($, Handlebars) {
         return this.isLoaded;
     };
 
-    templateLoader.prototype.loadTemplate = function (method) {
+    templateLoader.prototype.loadTemplate = function (method, context) {
         var $this = this;
         $.get(this.getFilePath(), function (resp) {
             var template = Handlebars.compile(resp);
-            $('#' + $this.id).html(template);
+            var html;
+            if(typeof context === "object") {
+                html = template(context);
+            } else {
+                html = template;
+            }
+            $('#' + $this.id).html(html);
             method();
         });
     };

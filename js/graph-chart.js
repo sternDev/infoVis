@@ -41,6 +41,9 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
             case'date':
                 parser = d3.time.format("%Y-%m-%d").parse;
                 break;
+            case'dateTime':
+                parser = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+                break;
 
             default:
                 throw 'The parserMode is not defined';
@@ -70,6 +73,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         // Get the data
         var that = this;
         d3.csv(this.filename, function (error, data) {
+            console.log(data);
             data.forEach(function (d) {
                 d.DATE = parser(d.DATE);
                 d.VALUE = +d.VALUE;

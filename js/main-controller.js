@@ -17,6 +17,10 @@ define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLo
             $("#dieselFlensburg").empty();
             $this.createGraphChartDiesel();
         });
+        $('#mapView').click(function () {
+            $("#dieselFlensburg").empty();
+            $this.createMapView();
+        });
     };
 
     mainController.prototype.createBarChartTemplate = function () {
@@ -45,6 +49,17 @@ define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLo
                     var graphChart = new GraphChart("crudeOil" + year, "../data/created/crude-oil/crude-oil-" + year + ".csv");
                     graphChart.createDiagram([0, 0.8], 'date');
                 }
+            });
+        });
+    };
+
+    mainController.prototype.createMapView = function () {
+        var templateLoader = new TemplateLoader();
+        templateLoader.setFilename('map-view.hbs');
+        templateLoader.setId(this.id);
+        templateLoader.loadTemplate(function () {
+            require(['map'], function (Map) {
+                new Map();
             });
         });
     };
