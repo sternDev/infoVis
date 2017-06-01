@@ -99,7 +99,8 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
             // Add the Y Axis
             that.svg.append("g")
                 .attr("class", "y axis")
-                .call(yAxis);
+                .call(yAxis)
+                .append('text').text('ghsjgs').style('stroke', 'black').attr('x', 100).attr('y', 100);
 
             if (that.addingPoints) {
                 that.addPoints(data, x, y);
@@ -108,7 +109,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
     };
 
     graphChart.prototype.addPoints = function (data, x, y) {
-        var formatDate = d3.time.format("%H:%M:%S");
+        var formatDate = d3.time.format("%d.%m.%Y %H:%M:%S");
 
         // Define the div for the tooltip
         var div = d3.select(this.id).append("div")

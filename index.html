@@ -19,8 +19,32 @@
         <li><a href="javascript:void(0);" id="mapView">Map</a></li>
     </ul>
 </nav>
+<p>
+    <label for="gasArt">Benzinart:</label>
+    <select id="gasArt">
+        <option value="diesel">Diesel</option>
+        <option value="e5" n>Benzin</option>
+        <option value="e10">E10</option>
+    </select>
+</p>
+<p>
+    <label for="startDate">Startdatum:</label>
+    <input type="date" id="startDate"/>
+    <label for="endDate">Enddatum:</label>
+    <input type="date" id="endDate"/>
+</p>
+<p>
+    <label for="postCode">PLZ-Auswahl:</label>
+    <input type="text" id="postCode"/>
+</p>
+http://xoxco.com/projects/code/tagsinput/example.html
 
+<div class="clear"></div>
+<div id="mapViewBlock"></div>
 <div id="mainBlock"></div>
+<div class="clear"></div>
+tankerkönig verlinken<br />
+Copyright hinzufügen
 <script>
     require(['jquery', 'main-controller', 'prices'], function ($, MainController, Prices) {
         $(document).ready(function () {
@@ -30,5 +54,10 @@
         });
     });
 </script>
+<br /><br />
+https://de.statista.com/statistik/daten/studie/776/umfrage/durchschnittspreis-fuer-superbenzin-seit-dem-jahr-1972/<br />
+http://www.clever-tanken.de/statistik/staedte<br />
+https://benzinpreis.de/statistik.phtml<br />
+https://www.tanke-guenstig.de/Benzinpreise
 </body>
 </html>

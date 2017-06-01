@@ -4,8 +4,9 @@
 define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLoader) {
     var mainController = function (id) {
         this.id = id;
-        this.createBarChartTemplate();
         var $this = this;
+
+        $this.createMapView();
         $('#priceGraphChart').click(function () {
             $this.createGraphChart();
         });
@@ -56,12 +57,12 @@ define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLo
     mainController.prototype.createMapView = function () {
         var templateLoader = new TemplateLoader();
         templateLoader.setFilename('map-view.hbs');
-        templateLoader.setId(this.id);
+        templateLoader.setId('mapViewBlock');
         templateLoader.loadTemplate(function () {
             require(['map'], function (Map) {
                 new Map();
             });
-        });
+          });
     };
 
     mainController.prototype.createGraphChartDiesel = function () {
