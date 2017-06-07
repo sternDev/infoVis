@@ -14,12 +14,7 @@ define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLo
             $("#firstChart").empty();
             $this.createBarChartTemplate();
         });
-        $('#priceBarChartNEW').click(function () {
-            $("#dieselFlensburg").empty();
-            $this.createGraphChartDiesel();
-        });
         $('#mapView').click(function () {
-            $("#dieselFlensburg").empty();
             $this.createMapView();
         });
     };
@@ -62,21 +57,7 @@ define('main-controller', ['jquery', 'template-loader'], function ($, TemplateLo
             require(['map'], function (Map) {
                 new Map();
             });
-          });
-    };
-
-    mainController.prototype.createGraphChartDiesel = function () {
-        var templateLoader = new TemplateLoader();
-        templateLoader.setFilename('prices-crude-oil-diesel.hbs');
-        templateLoader.setId(this.id);
-        templateLoader.loadTemplate(function () {
-            require(['graph-chart'], function (GraphChart) {
-                var graphChart = new GraphChart('dieselFlensburg', "/data/created/diesel/diesel.csv");
-                graphChart.setAddPoints(true);
-                graphChart.createDiagram([1000, 1200], 'time');
-            });
         });
-
     };
 
     return mainController;

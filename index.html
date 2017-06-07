@@ -10,54 +10,63 @@
 </head>
 <body>
 <h1>Benzinpreise - Informationsvisualisierung</h1>
-
+<!--
 <nav>
     <ul>
         <li><a href="javascript:void(0);" id="priceBarChart">Rohölpreise (BarChart)</a></li>
         <li><a href="javascript:void(0);" id="priceGraphChart">Rohölpreise (GraphChart)</a></li>
-        <li><a href="javascript:void(0);" id="priceBarChartNEW">Dieselpreise für Flensburg Star</a></li>
         <li><a href="javascript:void(0);" id="mapView">Map</a></li>
     </ul>
 </nav>
-<p>
-    <label for="gasArt">Benzinart:</label>
-    <select id="gasArt">
-        <option value="diesel">Diesel</option>
-        <option value="e5" n>Benzin</option>
-        <option value="e10">E10</option>
-    </select>
-</p>
-<p>
-    <label for="startDate">Startdatum:</label>
-    <input type="date" id="startDate"/>
-    <label for="endDate">Enddatum:</label>
-    <input type="date" id="endDate"/>
-</p>
-<p>
-    <label for="postCode">PLZ-Auswahl:</label>
-    <input type="text" id="postCode"/>
-</p>
-http://xoxco.com/projects/code/tagsinput/example.html
+-->
+<div class="infos">
+    <p>
+        <label for="gasArt">Benzinart:</label>
+        <select id="gasArt">
+            <option value="diesel">Diesel</option>
+            <option value="e5" n>Benzin</option>
+            <option value="e10">E10</option>
+        </select>
+    </p>
+    <p>
+        <label for="startDate">Startdatum:</label>
+        <input type="date" id="startDate"/>
+        <label for="endDate">Enddatum:</label>
+        <input type="date" id="endDate"/>
+    </p>
+    <p>
+        <label for="postCode">PLZ-Auswahl:</label>
+        <input type="text" id="postCode"/>
+    </p>
+</div>
 
 <div class="clear"></div>
 <div id="mapViewBlock"></div>
 <div id="mainBlock"></div>
 <div class="clear"></div>
-tankerkönig verlinken<br />
-Copyright hinzufügen
+<footer>
+    <div class="creadits">
+        <a href="https://creativecommons.tankerkoenig.de/">Benzinpreis-Quelle: Tankerkönig</a>
+
+        Copyright hinzufügen
+    </div>
+</footer>
 <script>
-    require(['jquery', 'main-controller', 'prices'], function ($, MainController, Prices) {
+    require(['jquery', 'main-controller'], function ($, MainController) {
         $(document).ready(function () {
             new MainController('mainBlock');
-            var p = new Prices();
-            // p.test();
         });
     });
 </script>
-<br /><br />
-https://de.statista.com/statistik/daten/studie/776/umfrage/durchschnittspreis-fuer-superbenzin-seit-dem-jahr-1972/<br />
-http://www.clever-tanken.de/statistik/staedte<br />
-https://benzinpreis.de/statistik.phtml<br />
-https://www.tanke-guenstig.de/Benzinpreise
+</body>
+<!--
+<br/><br/>
+https://de.statista.com/statistik/daten/studie/776/umfrage/durchschnittspreis-fuer-superbenzin-seit-dem-jahr-1972/<br/>
+http://www.clever-tanken.de/statistik/staedte<br/>
+https://benzinpreis.de/statistik.phtml<br/>
+https://www.tanke-guenstig.de/Benzinpreise<br />
+
+http://xoxco.com/projects/code/tagsinput/example.html
+-->
 </body>
 </html>

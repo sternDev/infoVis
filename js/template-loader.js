@@ -6,7 +6,6 @@ define('template-loader', ['jquery', 'handlebars'], function ($, Handlebars) {
         this.templatePath = 'templates/';
         this.filename = '';
         this.id = '';
-        this.isLoaded = false;
     };
 
     templateLoader.prototype.setFilename = function (filename) {
@@ -21,16 +20,12 @@ define('template-loader', ['jquery', 'handlebars'], function ($, Handlebars) {
         return this.templatePath + this.filename;
     };
 
-    templateLoader.prototype.isTemplateLoaded = function () {
-        return this.isLoaded;
-    };
-
     templateLoader.prototype.loadTemplate = function (method, context) {
         var $this = this;
         $.get(this.getFilePath(), function (resp) {
             var template = Handlebars.compile(resp);
             var html;
-            if(typeof context === "object") {
+            if (typeof context === "object") {
                 html = template(context);
             } else {
                 html = template;

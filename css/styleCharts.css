@@ -1,5 +1,7 @@
 body {
     font: 12px Arial;
+    padding: 0;
+    margin: 0;
 }
 
 path {
@@ -50,20 +52,67 @@ svg .pumpkin {
 /*  Map */
 
 #map {
-    height: 500px;
+    height: 700px;
+    position: static;
 }
 
-#mapViewBlock{
+#mapViewBlock {
     width: 20%;
     float: left;
 }
+
 #mainBlock {
-    width:80%;
+    width: 80%;
     box-sizing: border-box;
-    float:left;
+    float: left;
     padding-left: 40px;
 }
 
 .clear {
     clear: both;
+}
+
+.infos {
+    background-color: #e3e3e3;
+    padding: 20px;
+}
+
+.hoverBox .deleteDiagramm {
+    display: none;
+}
+
+.hoverBox:hover {
+
+    position: relative;
+}
+
+.hoverBox:hover .deleteDiagramm {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #666666;
+    border-radius: 20px;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    color: white;
+    display: block;
+    font-size: 30px;
+    opacity: 0.6;
+}
+
+.hoverBox:hover .deleteDiagramm:hover {
+    background-color: #3388ff;
+    cursor: pointer;
+}
+
+.hoverBox .smallBox {
+    width: 20%;
+    float: left;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    padding: 20px;
 }
