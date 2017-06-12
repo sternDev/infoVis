@@ -2,16 +2,30 @@
     <div class="deleteDiagramm">x</div>
     <h2>{{name }}:</h2>
     <div class="smallBox">
+        <h3>Adresse:</h3>
+        <p>
+            {{street}} {{houseNumber}}<br/>
+            {{postCode}} {{place}}
+        </p>
+    </div>
+    <div class="smallBox">
         <h3>Ausgewählter Zeitraum:</h3>
-        <p>20.05.2017 - 12.06.2017</p>
+        <p>{{selectedStartDate}} - {{selectedEndDate}}</p>
     </div>
 
     <div class="smallBox">
-        <h3>Adresse:</h3>
-        <p>
-            Musterstraße 25<br/>
-            12345 Musterhausen
-        </p>
+        <h3>Ausgewählte Benzinart:</h3>
+        <p>{{selectedGasArt}}</p>
     </div>
-    <div id="dieselFlensburg"></div>
+
+    <div class="smallBox">
+        <h3>Legende:</h3>
+        <p><span class="colorBox blue"></span> Tankstellenpreis</p>
+        <p><span class="colorBox orange"></span> Rohölpreis</p>
+    </div>
+    <div class="clear"></div>
+    <img src="/images/loader.svg" alt="es lädt..." id="loader{{key}}" class="loader"/>
+    <div id="diagramPrices{{key}}" class="diagramPrices">
+    </div>
 </div>
+<div class="clear"></div>

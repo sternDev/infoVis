@@ -5,6 +5,7 @@
     <title>Benzinpreise - Informationsvisualisierung</title>
     <link rel="stylesheet" href="css/styleCharts.css">
     <link rel="stylesheet" href="js/lib/leaflet/leaflet.css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="js/lib/require.js"></script>
     <script src="js/main.js"></script>
 </head>
@@ -33,11 +34,15 @@
         <input type="date" id="startDate"/>
         <label for="endDate">Enddatum:</label>
         <input type="date" id="endDate"/>
+        <input type="button" name="updateDates" id="updateDates" value="aktualisieren">
     </p>
     <p>
-        <label for="postCode">PLZ-Auswahl:</label>
-        <input type="text" id="postCode"/>
+        <label for="priceRange">Preisbereich:</label>
+        <input type="text" id="priceRange" readonly style="border:0; color:#f6931f; font-weight:bold;">
+
+        <span id="priceRangeSlider"></span>
     </p>
+
 </div>
 
 <div class="clear"></div>

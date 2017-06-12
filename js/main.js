@@ -7,6 +7,7 @@ requirejs.config({
         'd3-v3': 'lib/d3.v3.min',
         'd3-map': 'lib/geomap/d3.geomap',
         'd3-map-dep': 'lib/geomap/d3.geomap.dependencies.min',
-        'leaflet': 'lib/leaflet/leaflet'
+        'leaflet': 'lib/leaflet/leaflet',
+        'jqueryUI': "lib/jquery-ui.min"
     }
 });

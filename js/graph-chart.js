@@ -7,7 +7,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
     var graphChart = function (id, filename) {
         this.svg = null;
         this.margin = {top: 30, right: 20, bottom: 30, left: 50};
-        this.width = 1000 - this.margin.left - this.margin.right;
+        calculateWidth(this);
         this.height = 270 - this.margin.top - this.margin.bottom;
 
         this.id = "#" + id;
@@ -15,7 +15,17 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         this.filename = filename;
         $(this.id).empty();
         this.createSvg();
+
+        var that = this;
+        $(window).change(function () {
+            calculateWidth(that);
+        });
     };
+
+    function calculateWidth(context) {
+        var windowWidth = $('#mainBlock').width();
+        context.width = windowWidth - 80 - context.margin.left - context.margin.right;
+    }
 
     graphChart.prototype.createSvg = function () {
         this.svg = d3.select(this.id)
@@ -31,7 +41,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         this.addingPoints = addPoints;
     };
 
-    graphChart.prototype.createDiagram = function (range, parseMode) {
+    graphChart.prototype.createDiagram = function (range, parseMode, loaderId) {
         // Parse the date / time
         var parser;
         switch (parseMode) {
@@ -69,25 +79,79 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
             .y(function (d) {
                 return y(d.VALUE);
             });
+        // Define the second line
+        var valueline2 = d3.svg.line()
+            .x(function (d) {
+                return x(d.DATE);
+            })
+            .y(function (d) {
+                return y(d.VALUE);
+            });
 
         // Get the data
         var that = this;
         d3.csv(this.filename, function (error, data) {
+            $('#' + loaderId).css('display', 'none');
             console.log(data);
+            var pointData = [];
+            var usedDatesMax = [];
+            var usedDatesMin = [];
+
+            var maxValue = d3.max(data, function (d) {
+                return d.VALUE;
+            });
+            var minValue = d3.min(data, function (d) {
+                return d.VALUE;
+            });
+            var dailyValues = [];
             data.forEach(function (d) {
                 d.DATE = parser(d.DATE);
                 d.VALUE = +d.VALUE;
+
+
+                var newDate = new Date(d.DATE);
+                newDate = newDate.getFullYear() + '-' + (newDate.getMonth() + 1) + '-' + newDate.getDate();
+                    if(d.VALUE > (maxValue -100) && $.inArray( newDate, usedDatesMax ) === -1 ) {
+                 usedDatesMax.push(newDate);
+                 pointData.push({'DATE': d.DATE, 'VALUE': d.VALUE});
+                 }
+                 if(d.VALUE < (minValue +200) && $.inArray( newDate, usedDatesMin ) === -1 ) {
+                 usedDatesMin.push(newDate);
+                 pointData.push({'DATE': d.DATE, 'VALUE': d.VALUE});
+                 }
+
+                if (typeof dailyValues[newDate] === 'undefined') {
+                    dailyValues[newDate] = [];
+                }
+
+                dailyValues[newDate].push(d.VALUE);
+
             });
+         /*   console.log(dailyValues);
+
+            dailyValues.forEach(function (test) {
+                console.log(test);
+                var maxValue = d3.max(test, function (d) {
+                    return d.VALUE;
+                });
+                var minValue = d3.min(test, function (d) {
+                    return d.VALUE;
+                });
+
+            });
+*/
 
             // Scale the range of the data
             x.domain(d3.extent(data, function (d) {
                 return d.DATE;
             }));
             y.domain(range);
+            // y.domain( [1000,d3.max(data, function(d) { return d.VALUE; })]);
 
             // Add the valueline path.
             that.svg.append("path")
                 .attr("class", "line")
+                .attr("stroke", "steelblue")
                 .attr("d", valueline(data));
 
             // Add the X Axis
@@ -99,13 +163,37 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
             // Add the Y Axis
             that.svg.append("g")
                 .attr("class", "y axis")
-                .call(yAxis)
-                .append('text').text('ghsjgs').style('stroke', 'black').attr('x', 100).attr('y', 100);
+                .call(yAxis);
+            //.append('text').text('ghsjgs').style('stroke', 'black').attr('x', 100).attr('y', 100);
 
-            if (that.addingPoints) {
-                that.addPoints(data, x, y);
-            }
+
+            // if (that.addingPoints) {
+            that.addPoints(pointData, x, y);
+            // }
+
+            d3.csv('/data/created/crude-oil/crude-oil.csv', function (error, data) {
+                //$('#' + loaderId).css('display', 'none');
+                console.log(data);
+                parser = d3.time.format("%Y-%m-%d").parse;
+                data.forEach(function (d) {
+                    d.DATE = parser(d.DATE);
+                    d.VALUE = +(d.VALUE);
+                });
+
+
+                // Add the valueline path.
+                that.svg.append("path")
+                    .attr("class", "line")
+                    .attr("stroke", "orange")
+                    .attr("d", valueline2(data));
+                if (that.addingPoints) {
+                    that.addPoints(data, x, y);
+                }
+            });
+
         });
+
+
     };
 
     graphChart.prototype.addPoints = function (data, x, y) {
@@ -119,7 +207,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         this.svg.selectAll("dot")
             .data(data)
             .enter().append("circle")
-            .attr("r", 5)
+            .attr("r", 3)
             .attr("cx", function (d) {
                 return x(d.DATE);
             })

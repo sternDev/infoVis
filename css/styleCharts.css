@@ -5,7 +5,6 @@ body {
 }
 
 path {
-    stroke: steelblue;
     stroke-width: 2;
     fill: none;
 }
@@ -57,15 +56,17 @@ svg .pumpkin {
 }
 
 #mapViewBlock {
-    width: 20%;
+    width: 33%;
     float: left;
+    position: static;
+    position: sticky;
+    top: 152px;
 }
 
 #mainBlock {
-    width: 80%;
+    width: 66%;
     box-sizing: border-box;
     float: left;
-    padding-left: 40px;
 }
 
 .clear {
@@ -75,15 +76,26 @@ svg .pumpkin {
 .infos {
     background-color: #e3e3e3;
     padding: 20px;
+    position: static;
+    position: sticky;
+    top: 0;
+    z-index: 99999;
 }
 
 .hoverBox .deleteDiagramm {
     display: none;
 }
 
+.hoverBox {
+    padding: 20px;
+    margin: 20px;
+    border-radius: 20px;
+    border: 3px solid #fff;
+}
+
 .hoverBox:hover {
 
-    position: relative;
+    border: 3px solid #e3e3e3;
 }
 
 .hoverBox:hover .deleteDiagramm {
@@ -107,7 +119,7 @@ svg .pumpkin {
 }
 
 .hoverBox .smallBox {
-    width: 20%;
+    width: 25%;
     float: left;
 }
 
@@ -115,4 +127,30 @@ footer {
     position: fixed;
     bottom: 0;
     padding: 20px;
+}
+
+.loader {
+    margin: 0 42%;
+    position: absolute;
+    top: 45%;
+
+}
+
+#priceRangeSlider {
+    display: inline-block;
+    width: 300px;
+}
+
+.colorBox {
+    width: 20px;
+    height:2px;
+    display: inline-block;
+}
+
+.blue {
+    background-color: steelblue;
+}
+
+.orange {
+    background-color: orange;
 }

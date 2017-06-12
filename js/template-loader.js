@@ -35,5 +35,20 @@ define('template-loader', ['jquery', 'handlebars'], function ($, Handlebars) {
         });
     };
 
+    templateLoader.prototype.addToTemplate = function (method, context) {
+        var $this = this;
+        $.get(this.getFilePath(), function (resp) {
+            var template = Handlebars.compile(resp);
+            var html;
+            if (typeof context === "object") {
+                html = template(context);
+            } else {
+                html = template;
+            }
+            $('#' + $this.id).prepend( html);
+            method();
+        });
+    };
+
     return templateLoader;
 });
