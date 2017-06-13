@@ -70,9 +70,10 @@ define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
         var y = d3.scale.linear().range([this.height, 0]);
 
         // Define the axes
-        var xAxis = d3.svg.axis().scale(x)
-            .orient("bottom").ticks(5);
 
+        var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(5).tickFormat(d3.time.format("%d.%m.%y"))
+        ;
         var yAxis = d3.svg.axis().scale(y)
             .orient("left").ticks(5);
 
@@ -206,7 +207,8 @@ define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
         });
 
 
-    };
+    }
+    ;
 
     graphChart.prototype.createMultipleLineDiagram = function (dataBlock, dataNames, range, parseMode, loaderId) {
         // Parse the date / time
@@ -234,7 +236,7 @@ define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
 
         // Define the axes
         var xAxis = d3.svg.axis().scale(x)
-            .orient("bottom").ticks(5);
+            .orient("bottom").ticks(5).tickFormat(d3.time.format("%d.%m.%y"));
 
         var yAxis = d3.svg.axis().scale(y)
             .orient("left").ticks(5);
