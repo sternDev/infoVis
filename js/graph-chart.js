@@ -13,6 +13,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         this.id = "#" + id;
         this.addingPoints = false;
         this.filename = filename;
+        this.currentData = null;
         $(this.id).empty();
         this.createSvg();
 
@@ -41,7 +42,11 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         this.addingPoints = addPoints;
     };
 
-    graphChart.prototype.createDiagram = function (range, parseMode, loaderId) {
+    graphChart.prototype.getCurrentData = function () {
+        return this.currentData;
+    };
+
+    graphChart.prototype.createDiagram = function (range, parseMode, loaderId, method) {
         // Parse the date / time
         var parser;
         switch (parseMode) {
@@ -91,7 +96,11 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         // Get the data
         var that = this;
         d3.csv(this.filename, function (error, data) {
-            $('#' + loaderId).css('display', 'none');
+            that.currentData = data;
+            $('#loader' + loaderId).css('display', 'none');
+            $('#addToComparision' + loaderId).css('display', 'block');
+
+            method();
             console.log(data);
             var pointData = [];
             var usedDatesMax = [];
@@ -111,14 +120,14 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
 
                 var newDate = new Date(d.DATE);
                 newDate = newDate.getFullYear() + '-' + (newDate.getMonth() + 1) + '-' + newDate.getDate();
-                    if(d.VALUE > (maxValue -100) && $.inArray( newDate, usedDatesMax ) === -1 ) {
-                 usedDatesMax.push(newDate);
-                 pointData.push({'DATE': d.DATE, 'VALUE': d.VALUE});
-                 }
-                 if(d.VALUE < (minValue +200) && $.inArray( newDate, usedDatesMin ) === -1 ) {
-                 usedDatesMin.push(newDate);
-                 pointData.push({'DATE': d.DATE, 'VALUE': d.VALUE});
-                 }
+                if (d.VALUE > (maxValue - 100) && $.inArray(newDate, usedDatesMax) === -1) {
+                    usedDatesMax.push(newDate);
+                    pointData.push({'DATE': d.DATE, 'VALUE': d.VALUE});
+                }
+                if (d.VALUE < (minValue + 200) && $.inArray(newDate, usedDatesMin) === -1) {
+                    usedDatesMin.push(newDate);
+                    pointData.push({'DATE': d.DATE, 'VALUE': d.VALUE});
+                }
 
                 if (typeof dailyValues[newDate] === 'undefined') {
                     dailyValues[newDate] = [];
@@ -127,19 +136,20 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
                 dailyValues[newDate].push(d.VALUE);
 
             });
-         /*   console.log(dailyValues);
 
-            dailyValues.forEach(function (test) {
-                console.log(test);
-                var maxValue = d3.max(test, function (d) {
-                    return d.VALUE;
-                });
-                var minValue = d3.min(test, function (d) {
-                    return d.VALUE;
-                });
+            /*   console.log(dailyValues);
 
-            });
-*/
+             dailyValues.forEach(function (test) {
+             console.log(test);
+             var maxValue = d3.max(test, function (d) {
+             return d.VALUE;
+             });
+             var minValue = d3.min(test, function (d) {
+             return d.VALUE;
+             });
+
+             });
+             */
 
             // Scale the range of the data
             x.domain(d3.extent(data, function (d) {
@@ -167,32 +177,212 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
             //.append('text').text('ghsjgs').style('stroke', 'black').attr('x', 100).attr('y', 100);
 
 
-            // if (that.addingPoints) {
-            that.addPoints(pointData, x, y);
-            // }
+            if (that.addingPoints) {
+                that.addPoints(data, x, y);
+            } else {
+                that.addPoints(pointData, x, y);
+                d3.csv('/data/created/crude-oil/crude-oil.csv', function (error, data) {
+                    //$('#' + loaderId).css('display', 'none');
+                    console.log(data);
+                    parser = d3.time.format("%Y-%m-%d").parse;
+                    data.forEach(function (d) {
+                        d.DATE = parser(d.DATE);
+                        d.VALUE = +(d.VALUE);
+                    });
 
-            d3.csv('/data/created/crude-oil/crude-oil.csv', function (error, data) {
-                //$('#' + loaderId).css('display', 'none');
-                console.log(data);
-                parser = d3.time.format("%Y-%m-%d").parse;
-                data.forEach(function (d) {
-                    d.DATE = parser(d.DATE);
-                    d.VALUE = +(d.VALUE);
+
+                    // Add the valueline path.
+                    that.svg.append("path")
+                        .attr("class", "line")
+                        .attr("stroke", "orange")
+                        .attr("d", valueline2(data));
+                    if (that.addingPoints) {
+                        that.addPoints(data, x, y);
+                    }
                 });
+            }
 
 
-                // Add the valueline path.
-                that.svg.append("path")
-                    .attr("class", "line")
-                    .attr("stroke", "orange")
-                    .attr("d", valueline2(data));
-                if (that.addingPoints) {
-                    that.addPoints(data, x, y);
-                }
-            });
 
         });
 
+
+    };
+
+    graphChart.prototype.createMultipleLineDiagram = function (dataBlock, dataNames, range, parseMode, loaderId) {
+        // Parse the date / time
+        var colors = ['green', 'BlueViolet', 'Chocolate', 'Crimson', 'DodgerBlue'];
+        var parser;
+        switch (parseMode) {
+            case 'time':
+                parser = d3.time.format("%H:%M:%S").parse;
+                break;
+            case'date':
+                parser = d3.time.format("%Y-%m-%d").parse;
+                break;
+            case'dateTime':
+                parser = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
+                break;
+
+            default:
+                throw 'The parserMode is not defined';
+                break;
+        }
+
+        // Set the ranges
+        var x = d3.time.scale().range([0, this.width]);
+        var y = d3.scale.linear().range([this.height, 0]);
+
+        // Define the axes
+        var xAxis = d3.svg.axis().scale(x)
+            .orient("bottom").ticks(5);
+
+        var yAxis = d3.svg.axis().scale(y)
+            .orient("left").ticks(5);
+
+
+        var that = this;
+        var counter = 0;
+        var mouseG = that.svg.append("g")
+            .attr("class", "mouse-over-effects");
+        $('#pricesComparisionLegend').empty();
+        dataBlock.forEach(function (data, key) {
+            // Define the line
+            var valueline = d3.svg.line()
+                .x(function (d) {
+                    return x(d.DATE);
+                })
+                .y(function (d) {
+                    return y(d.VALUE);
+                });
+            // Get the data
+
+            $('#' + loaderId).css('display', 'none');
+            console.log(data);
+
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function (d) {
+                return d.DATE;
+            }));
+            y.domain(range);
+            // y.domain( [1000,d3.max(data, function(d) { return d.VALUE; })]);
+
+            // Add the valueline path.
+            that.svg.append("path")
+                .attr("class", "line")
+                .attr("stroke", colors[counter])
+                .attr("d", valueline(data));
+            var gasStationName = dataNames[key];
+            $('#pricesComparisionLegend').append('<p><span class="colorBox" style="background-color: ' + colors[counter] + ';"></span> ' + gasStationName + '</p>');
+
+
+
+/*
+            mouseG.append("path") // this is the black vertical line to follow mouse
+                .attr("class", "mouse-line")
+                .style("stroke", "black")
+                .style("stroke-width", "1px")
+                .style("opacity", "0");
+
+            var mousePerLine = mouseG.selectAll('.mouse-per-line')
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "mouse-per-line");
+
+            mousePerLine.append("circle")
+                .attr("r", 7)
+                .style("stroke", colors[counter])
+                .style("fill", "none")
+                .style("stroke-width", "1px")
+                .style("opacity", "0");
+
+            mousePerLine.append("text")
+                .attr("transform", "translate(10,3)");
+*/
+
+
+            counter++;
+        });
+
+
+/*
+
+        var lines = document.getElementsByClassName('line');
+
+
+        mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
+            .attr('width', that.width) // can't catch mouse events on a g element
+            .attr('height', that.height)
+            .attr('fill', 'none')
+            .attr('pointer-events', 'all')
+            .on('mouseout', function() { // on mouse out hide line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "0");
+                d3.selectAll(".mouse-per-line circle")
+                    .style("opacity", "0");
+                d3.selectAll(".mouse-per-line text")
+                    .style("opacity", "0");
+            })
+            .on('mouseover', function() { // on mouse in show line, circles and text
+                d3.select(".mouse-line")
+                    .style("opacity", "1");
+                d3.selectAll(".mouse-per-line circle")
+                    .style("opacity", "1");
+                d3.selectAll(".mouse-per-line text")
+                    .style("opacity", "1");
+            })
+            .on('mousemove', function() { // mouse moving over canvas
+                var mouse = d3.mouse(this);
+                d3.select(".mouse-line")
+                    .attr("d", function() {
+                        var d = "M" + mouse[0] + "," + that.height;
+                        d += " " + mouse[0] + "," + 0;
+                        return d;
+                    });
+
+                d3.selectAll(".mouse-per-line")
+                    .attr("transform", function(d, i) {
+                        console.log(d);
+                        var xDate = x.invert(mouse[0]),
+                            bisect = d3.bisector(function(d) { return d.DATE; }).right;
+                        idx = bisect(d.VALUE, xDate);
+
+                        var beginning = 0,
+                            end = lines[i].getTotalLength(),
+                            target = null;
+
+                        while (true){
+                            target = Math.floor((beginning + end) / 2);
+                            pos = lines[i].getPointAtLength(target);
+                            if ((target === end || target === beginning) && pos.x !== mouse[0]) {
+                                break;
+                            }
+                            if (pos.x > mouse[0])      end = target;
+                            else if (pos.x < mouse[0]) beginning = target;
+                            else break; //position found
+                        }
+
+                        d3.select(this).select('text')
+                            .text(y.invert(pos.y).toFixed(2));
+
+                        return "translate(" + mouse[0] + "," + pos.y +")";
+                    });
+            });
+*/
+
+        // Add the X Axis
+        that.svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + that.height + ")")
+            .call(xAxis);
+
+        // Add the Y Axis
+        that.svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+        //.append('text').text('ghsjgs').style('stroke', 'black').attr('x', 100).attr('y', 100);
 
     };
 

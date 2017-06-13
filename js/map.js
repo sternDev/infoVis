@@ -14,6 +14,9 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
             this.startDateOutput = null;
             this.endDateOutput = null;
             this.markers = [];
+            this.graphChart= [];
+            this.dataComparision= [];
+            this.dataComparisionName= [];
             this.range = [ 0, 1300 ];
             this.normalIcon = L.icon({
                 iconUrl: '/images/marker-icon.png'
@@ -70,12 +73,16 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
 
         map.prototype.updateAllDiagrams = function () {
             var that = this;
-            $('.hoverBox').each(function (key, value) {
+            $('#mainBlock .hoverBox').each(function (key, value) {
                 var id = $(this).find('.diagramPrices').attr('id');
                 id = id.split('diagramPrices')['1'];
                 $(this).remove();
                 createDataSetToLoadPrices(that, that.gasStationData[id], id);
             });
+
+
+
+            that.loadPricesComparision();
         };
 
         function formatDateForOutput(dateValue) {
@@ -179,19 +186,68 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
                 templateLoader.setFilename('prices-crude-oil-new.hbs');
                 templateLoader.setId('mainBlock');
                 templateLoader.addToTemplate(function () {
-                    var graphChart = new GraphChart('diagramPrices' + data.key, "//infovis.ladyscript.ninja/comm/prices-gas-station.php?gasStationId=" + gasStationId + "&type=" + that.currentGasArt + "&startDate=" + that.startDate + "&endDate=" + that.endDate);
+                    that.graphChart[data.key] = new GraphChart('diagramPrices' + data.key, "//infovis.ladyscript.ninja/comm/prices-gas-station.php?gasStationId=" + gasStationId + "&type=" + that.currentGasArt + "&startDate=" + that.startDate + "&endDate=" + that.endDate);
 
-                    graphChart.setAddPoints(getDiffBetweenDays(that.startDate, that.endDate) <= 3);
-                    graphChart.createDiagram(that.range,'dateTime', 'loader' + data.key);
+                    that.graphChart[data.key].setAddPoints(getDiffBetweenDays(that.startDate, that.endDate) <= 3);
+                    that.graphChart[data.key].createDiagram(that.range,'dateTime', data.key, function() {
+                        $('#addToComparision'+data.key).click(function () {
+                            var id = $(this).closest('div.hoverBox').find('.diagramPrices').attr('id');
+                            id = id.split('diagramPrices')['1'];
+                            if(typeof that.dataComparision[id] === 'undefined' || that.dataComparision[id] === null) {
+                                that.dataComparision[id] = that.graphChart[id].getCurrentData();
+                                console.log(that.dataComparision[id]);
+
+                                $(this).html('Vom Vergleich entfernen');
+                            } else {
+                                that.dataComparision.splice(id, 1);
+
+                                $(this).html('Zum Vergleich hinzufügen');
+                            }
+
+                            that.loadPricesComparision();
+                        });
+                    });
+
+
+                    that.dataComparisionName[data.key] = data.name;
+
                     $('.deleteDiagramm').click(function () {
                         var id = $(this).closest('div.hoverBox').find('.diagramPrices').attr('id');
                         id = id.split('diagramPrices')['1'];
                         that.markers[id].setIcon(that.normalIcon);
                         $(this).closest('div.hoverBox').remove();
                     });
+
                 }, data);
             });
         };
+
+    map.prototype.loadPricesComparision = function () {
+        var that = this;
+        var data = that.dataComparision;
+        var dataNames = that.dataComparisionName;
+        console.log(data);
+        var loadTemplate = false;
+        data.forEach(function (value) {
+            if(value !== null) {
+                loadTemplate = true;
+                return false;
+            }
+        });
+        if(loadTemplate === false) {
+            $('#pricesComparisionBlock').empty();
+        } else {
+            require(['template-loader', 'graph-chart'], function (TemplateLoader, GraphChart) {
+                var templateLoader = new TemplateLoader();
+                templateLoader.setFilename('prices-comparision.hbs');
+                templateLoader.setId('pricesComparisionBlock');
+                templateLoader.loadTemplate(function () {
+                    that.graphChart[data.key] = new GraphChart('diagramPricesComparision');
+                    that.graphChart[data.key].createMultipleLineDiagram(data, dataNames, that.range, 'dateTime', 'loaderComparision');
+                }, data);
+            });
+        }
+    };
 
         return map;
     }

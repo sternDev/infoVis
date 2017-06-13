@@ -45,6 +45,7 @@ if(isset($_GET['gasStationId'])) {
 
     $sql = "SELECT * FROM gas_station_information_history WHERE stid = '".$gasStationId."' ";
     $sql .= "AND date >= '".$startDate."' AND date <= '".$endDate."' ";
+    $sql .= "AND ".$type." > 0 ";
     $sth = $db->prepare($sql);
     $res = $sth->execute();
 
