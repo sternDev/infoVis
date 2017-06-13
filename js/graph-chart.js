@@ -2,7 +2,7 @@
  * Created by Jasmin on 25.04.2017.
  */
 
-define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
+define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
 
     var graphChart = function (id, filename) {
         this.svg = null;
@@ -203,7 +203,6 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
             }
 
 
-
         });
 
 
@@ -245,6 +244,14 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
         var counter = 0;
         var mouseG = that.svg.append("g")
             .attr("class", "mouse-over-effects");
+
+
+        mouseG.append("path") // this is the black vertical line to follow mouse
+            .attr("class", "mouse-line")
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("opacity", "0");
+
         $('#pricesComparisionLegend').empty();
         dataBlock.forEach(function (data, key) {
             // Define the line
@@ -270,27 +277,18 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
 
             // Add the valueline path.
             that.svg.append("path")
-                .attr("class", "line")
+                .attr("class", "lineComparision")
                 .attr("stroke", colors[counter])
                 .attr("d", valueline(data));
             var gasStationName = dataNames[key];
             $('#pricesComparisionLegend').append('<p><span class="colorBox" style="background-color: ' + colors[counter] + ';"></span> ' + gasStationName + '</p>');
 
 
-
-/*
-            mouseG.append("path") // this is the black vertical line to follow mouse
-                .attr("class", "mouse-line")
-                .style("stroke", "black")
-                .style("stroke-width", "1px")
-                .style("opacity", "0");
-
             var mousePerLine = mouseG.selectAll('.mouse-per-line')
                 .data(data)
                 .enter()
                 .append("g")
                 .attr("class", "mouse-per-line");
-
             mousePerLine.append("circle")
                 .attr("r", 7)
                 .style("stroke", colors[counter])
@@ -300,16 +298,13 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
 
             mousePerLine.append("text")
                 .attr("transform", "translate(10,3)");
-*/
 
 
             counter++;
         });
 
 
-/*
-
-        var lines = document.getElementsByClassName('line');
+        var lines = document.getElementsByClassName('lineComparision');
 
 
         mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
@@ -317,7 +312,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
             .attr('height', that.height)
             .attr('fill', 'none')
             .attr('pointer-events', 'all')
-            .on('mouseout', function() { // on mouse out hide line, circles and text
+            .on('mouseout', function () { // on mouse out hide line, circles and text
                 d3.select(".mouse-line")
                     .style("opacity", "0");
                 d3.selectAll(".mouse-per-line circle")
@@ -325,7 +320,7 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
                 d3.selectAll(".mouse-per-line text")
                     .style("opacity", "0");
             })
-            .on('mouseover', function() { // on mouse in show line, circles and text
+            .on('mouseover', function () { // on mouse in show line, circles and text
                 d3.select(".mouse-line")
                     .style("opacity", "1");
                 d3.selectAll(".mouse-per-line circle")
@@ -333,44 +328,46 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
                 d3.selectAll(".mouse-per-line text")
                     .style("opacity", "1");
             })
-            .on('mousemove', function() { // mouse moving over canvas
+            .on('mousemove', function () { // mouse moving over canvas
                 var mouse = d3.mouse(this);
                 d3.select(".mouse-line")
-                    .attr("d", function() {
+                    .attr("d", function () {
                         var d = "M" + mouse[0] + "," + that.height;
                         d += " " + mouse[0] + "," + 0;
                         return d;
                     });
 
                 d3.selectAll(".mouse-per-line")
-                    .attr("transform", function(d, i) {
+                    .attr("transform", function (d, i) {
                         console.log(d);
                         var xDate = x.invert(mouse[0]),
-                            bisect = d3.bisector(function(d) { return d.DATE; }).right;
+                            bisect = d3.bisector(function (d) {
+                                return d.DATE;
+                            }).right;
                         idx = bisect(d.VALUE, xDate);
 
                         var beginning = 0,
                             end = lines[i].getTotalLength(),
                             target = null;
 
-                        while (true){
+                        while (true) {
                             target = Math.floor((beginning + end) / 2);
                             pos = lines[i].getPointAtLength(target);
                             if ((target === end || target === beginning) && pos.x !== mouse[0]) {
                                 break;
                             }
-                            if (pos.x > mouse[0])      end = target;
+                            if (pos.x > mouse[0]) end = target;
                             else if (pos.x < mouse[0]) beginning = target;
                             else break; //position found
                         }
 
                         d3.select(this).select('text')
-                            .text(y.invert(pos.y).toFixed(2));
+                            .text((y.invert(pos.y) / 1000).toFixed(3).replace('.', ',') + " €");
 
-                        return "translate(" + mouse[0] + "," + pos.y +")";
+                        return "translate(" + mouse[0] + "," + pos.y + ")";
                     });
             });
-*/
+
 
         // Add the X Axis
         that.svg.append("g")
@@ -408,9 +405,9 @@ define('graph-chart', ['jquery', 'd3-v3'], function ($, d3) {
                 div.transition()
                     .duration(200)
                     .style("opacity", .9);
-                div.html(formatDate(d.DATE) + "<br/>" + d.VALUE)
-                    .style("left", (d3.event.pageX) + "px")
-                    .style("top", (d3.event.pageY - 28) + "px");
+                div.html(formatDate(d.DATE) + "<br/>" + (d.VALUE / 1000).toFixed(3).replace('.', ',') + ' €')
+                    .style("left", d3.event.pageX - $('#map').width() - 40 + "px")
+                    .style("top", (d3.event.pageY - 28) - event.pageY + 200 + "px");
             })
             .on("mouseout", function (d) {
                 div.transition()
