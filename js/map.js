@@ -19,16 +19,23 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
             this.dataComparisionName= [];
             this.range = [ 0, 1300 ];
             this.normalIcon = L.icon({
-                iconUrl: '/images/marker-icon.png'
+                iconUrl: '/images/marker-icon.png',
+                iconSize:     [25, 41], // size of the icon
+                iconAnchor:   [12, 41], // point of the icon which will correspond to marker's location
+                popupAnchor:  [12, -41]
             });
             this.selectedIcon = L.icon({
-                iconUrl: '/images/marker-icon-selected.png'
+                iconUrl: '/images/marker-icon-selected.png',
+                iconSize:     [25, 41], // size of the icon
+                iconAnchor:   [12, 41], // point of the icon which will correspond to marker's location
+                popupAnchor:  [12, -41]
             });
             var that = this;
 
             $('#gasArt').change(function () {
                 that.currentGasArt = $(this).val();
                 that.currentGasArtOutput = $("#gasArt option:selected").text();
+                that.graphChart = [];
                 that.updateAllDiagrams();
 
             });
@@ -44,6 +51,7 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
 
                 that.endDate = $('#endDate').val();
                 that.endDateOutput = formatDateForOutput(that.endDate);
+                that.graphChart = [];
                 that.updateAllDiagrams();
             });
 
@@ -186,28 +194,28 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
                 templateLoader.setFilename('prices-crude-oil-new.hbs');
                 templateLoader.setId('mainBlock');
                 templateLoader.addToTemplate(function () {
-                    that.graphChart[data.key] = new GraphChart('diagramPrices' + data.key, "//infovis.ladyscript.ninja/comm/prices-gas-station.php?gasStationId=" + gasStationId + "&type=" + that.currentGasArt + "&startDate=" + that.startDate + "&endDate=" + that.endDate);
+                    if(typeof that.graphChart[data.key] === 'undefined' || that.graphChart[data.key] === null) {
 
-                    that.graphChart[data.key].setAddPoints(getDiffBetweenDays(that.startDate, that.endDate) <= 3);
-                    that.graphChart[data.key].createDiagram(that.range,'dateTime', data.key, function() {
-                        $('#addToComparision'+data.key).click(function () {
+                        that.graphChart[data.key] = new GraphChart('diagramPrices' + data.key, "//infovis.ladyscript.ninja/comm/prices-gas-station.php?gasStationId=" + gasStationId + "&type=" + that.currentGasArt + "&startDate=" + that.startDate + "&endDate=" + that.endDate);
+                        that.graphChart[data.key].setAddPoints(getDiffBetweenDays(that.startDate, that.endDate) <= 3);
+
+                    }
+
+                    that.graphChart[data.key].createDiagram(that.range, 'dateTime', data.key, function () {
+                        $('#addToComparision' + data.key).click(function () {
                             var id = $(this).closest('div.hoverBox').find('.diagramPrices').attr('id');
                             id = id.split('diagramPrices')['1'];
-                            if(typeof that.dataComparision[id] === 'undefined' || that.dataComparision[id] === null) {
+                            if (typeof that.dataComparision[id] === 'undefined' || that.dataComparision[id] === null) {
                                 that.dataComparision[id] = that.graphChart[id].getCurrentData();
-                                console.log(that.dataComparision[id]);
-
                                 $(this).html('Vom Vergleich entfernen');
                             } else {
                                 that.dataComparision.splice(id, 1);
-
                                 $(this).html('Zum Vergleich hinzufügen');
                             }
 
                             that.loadPricesComparision();
                         });
                     });
-
 
                     that.dataComparisionName[data.key] = data.name;
 
@@ -226,7 +234,6 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
         var that = this;
         var data = that.dataComparision;
         var dataNames = that.dataComparisionName;
-        console.log(data);
         var loadTemplate = false;
         data.forEach(function (value) {
             if(value !== null) {
