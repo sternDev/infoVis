@@ -221,22 +221,6 @@ define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
     graphChart.prototype.createMultipleLineDiagram = function (dataBlock, dataNames, range, parseMode, loaderId) {
         // Parse the date / time
         var colors = ['green', 'BlueViolet', 'Chocolate', 'Crimson', 'DodgerBlue'];
-        var parser;
-        switch (parseMode) {
-            case 'time':
-                parser = d3.time.format("%H:%M:%S").parse;
-                break;
-            case'date':
-                parser = d3.time.format("%Y-%m-%d").parse;
-                break;
-            case'dateTime':
-                parser = d3.time.format("%Y-%m-%d %H:%M:%S").parse;
-                break;
-
-            default:
-                throw 'The parserMode is not defined';
-                break;
-        }
 
         // Set the ranges
         var x = d3.time.scale().range([0, this.width]);
@@ -261,56 +245,6 @@ define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
             .style("stroke", "black")
             .style("stroke-width", "1px")
             .style("opacity", "0");
-
-        $('#pricesComparisionLegend').empty();
-        dataBlock.forEach(function (data, key) {
-            // Define the line
-            var valueline = d3.svg.line()
-                .x(function (d) {
-                    return x(d.DATE);
-                })
-                .y(function (d) {
-                    return y(d.VALUE);
-                });
-            // Get the data
-
-            $('#' + loaderId).css('display', 'none');
-
-            // Scale the range of the data
-            x.domain(d3.extent(data, function (d) {
-                return d.DATE;
-            }));
-            y.domain(range);
-            // y.domain( [1000,d3.max(data, function(d) { return d.VALUE; })]);
-
-            // Add the valueline path.
-            that.svg.append("path")
-                .attr("class", "lineComparision")
-                .attr("stroke", colors[counter])
-                .attr("d", valueline(data));
-            var gasStationName = dataNames[key];
-            $('#pricesComparisionLegend').append('<p><span class="colorBox" style="background-color: ' + colors[counter] + ';"></span> ' + gasStationName + '</p>');
-
-
-            var mousePerLine = mouseG.selectAll('.mouse-per-line')
-                .data(data)
-                .enter()
-                .append("g")
-                .attr("class", "mouse-per-line");
-            mousePerLine.append("circle")
-                .attr("r", 7)
-                .style("stroke", colors[counter])
-                .style("fill", "none")
-                .style("stroke-width", "1px")
-                .style("opacity", "0");
-
-            mousePerLine.append("text")
-                .attr("transform", "translate(10,3)");
-
-
-            counter++;
-        });
-
 
         var lines = document.getElementsByClassName('lineComparision');
 
@@ -345,17 +279,19 @@ define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
                         return d;
                     });
 
+                var formatDate = d3.time.format("%d.%m.%Y %H:%M:%S");
                 d3.selectAll(".mouse-per-line")
                     .attr("transform", function (d, i) {
                         var xDate = x.invert(mouse[0]),
                             bisect = d3.bisector(function (d) {
-                                return d.DATE;
+                                return d.DATENEW;
                             }).right;
-                        idx = bisect(d.VALUE, xDate);
+                        var idx = bisect(d.VALUE, xDate);
 
                         var beginning = 0,
-                            end = lines[i].getTotalLength(),
-                            target = null;
+                            end = lines[i].getTotalLength();
+                        var target = null,
+                            pos = null;
 
                         while (true) {
                             target = Math.floor((beginning + end) / 2);
@@ -363,17 +299,78 @@ define('graph-chart', ['jquery', 'd3-v3', 'svg'], function ($, d3) {
                             if ((target === end || target === beginning) && pos.x !== mouse[0]) {
                                 break;
                             }
-                            if (pos.x > mouse[0]) end = target;
-                            else if (pos.x < mouse[0]) beginning = target;
-                            else break; //position found
+                            if (pos.x > mouse[0]) {
+                                end = target;
+                            } else if (pos.x < mouse[0]) {
+                                beginning = target;
+                            } else {
+                                break; //position found
+                            }
                         }
 
                         d3.select(this).select('text')
                             .text((y.invert(pos.y) / 1000).toFixed(3).replace('.', ',') + " €");
 
+                        if (mouse[0] <= 0 || pos.y <= 0) {
+                            return false;
+                        }
+
                         return "translate(" + mouse[0] + "," + pos.y + ")";
                     });
             });
+
+
+        $('#pricesComparisionLegend').empty();
+        dataBlock.forEach(function (data, key) {
+            // Define the line
+            var valueline = d3.svg.line()
+                .x(function (d) {
+                    return x(d.DATENEW);
+                })
+                .y(function (d) {
+                    return y(d.VALUE);
+                });
+            // Get the data
+
+            $('#' + loaderId).css('display', 'none');
+
+            // Scale the range of the data
+            x.domain(d3.extent(data, function (d) {
+                return d.DATENEW;
+            }));
+            y.domain(range);
+            // y.domain( [1000,d3.max(data, function(d) { return d.VALUE; })]);
+
+            // Add the valueline path.
+            that.svg.append("path")
+                .attr("class", "lineComparision")
+                .attr("stroke", colors[counter])
+                .attr("d", valueline(data));
+            var gasStationName = dataNames[key];
+            $('#pricesComparisionLegend').append('<p><span class="colorBox" style="background-color: ' + colors[counter] + ';"></span> ' + gasStationName + '</p>');
+
+
+            var mousePerLine = mouseG.selectAll('.mouse-per-line')
+                .data(data)
+                .enter()
+                .append("g")
+                .attr("class", "mouse-per-line");
+            mousePerLine.append("circle")
+                .attr("r", 7)
+                .style("stroke", colors[counter])
+                .style("fill", "none")
+                .style("stroke-width", "1px")
+                .style("opacity", "0");
+
+            mousePerLine.append("text")
+                .attr("transform", "translate(10,3)");
+
+
+            counter++;
+        });
+
+
+
 
 
         // Add the X Axis

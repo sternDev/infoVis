@@ -1,7 +1,7 @@
 /**
  * Created by Jasmin on 15.05.2017.
  */
-define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
+define('map', ['jquery', 'leaflet', 'jqueryUI'], function ($) {
         var map = function () {
             this.map = null;
             this.initMap();
@@ -14,21 +14,21 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
             this.startDateOutput = null;
             this.endDateOutput = null;
             this.markers = [];
-            this.graphChart= [];
-            this.dataComparision= [];
-            this.dataComparisionName= [];
-            this.range = [ 0, 1300 ];
+            this.graphChart = [];
+            this.dataComparision = [];
+            this.dataComparisionName = [];
+            this.range = [0, 1300];
             this.normalIcon = L.icon({
                 iconUrl: '/images/marker-icon.png',
-                iconSize:     [25, 41], // size of the icon
-                iconAnchor:   [12, 41], // point of the icon which will correspond to marker's location
-                popupAnchor:  [12, -41]
+                iconSize: [25, 41], // size of the icon
+                iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+                popupAnchor: [0, -41]
             });
             this.selectedIcon = L.icon({
                 iconUrl: '/images/marker-icon-selected.png',
-                iconSize:     [25, 41], // size of the icon
-                iconAnchor:   [12, 41], // point of the icon which will correspond to marker's location
-                popupAnchor:  [12, -41]
+                iconSize: [25, 41], // size of the icon
+                iconAnchor: [12, 41], // point of the icon which will correspond to marker's location
+                popupAnchor: [0, -41]
             });
             var that = this;
 
@@ -55,27 +55,27 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
                 that.updateAllDiagrams();
             });
 
-            $( "#priceRangeSlider" ).slider({
+            $("#priceRangeSlider").slider({
                 range: true,
                 min: 0,
                 max: 1900,
-                step:100,
+                step: 100,
                 values: that.range,
-                slide: function( event, ui ) {
-                    $( "#priceRange" ).val(  formatPrice(ui.values[ 0 ])+" - " + formatPrice(ui.values[ 1 ]) );
+                slide: function (event, ui) {
+                    $("#priceRange").val(formatPrice(ui.values[0]) + " - " + formatPrice(ui.values[1]));
                     that.range = ui.values;
                 },
-                stop: function() {
+                stop: function () {
 
 
                     that.updateAllDiagrams();
                 }
             });
-            $( "#priceRange" ).val( formatPrice($( "#priceRangeSlider" ).slider( "values", 0 )) +
-                " - " + formatPrice($( "#priceRangeSlider" ).slider( "values", 1 )) );
+            $("#priceRange").val(formatPrice($("#priceRangeSlider").slider("values", 0)) +
+                " - " + formatPrice($("#priceRangeSlider").slider("values", 1)));
 
             function formatPrice(price) {
-                return ((price/1000).toFixed(2)).replace('.',',')+" €";
+                return ((price / 1000).toFixed(2)).replace('.', ',') + " €";
             }
         };
 
@@ -87,7 +87,6 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
                 $(this).remove();
                 createDataSetToLoadPrices(that, that.gasStationData[id], id);
             });
-
 
 
             that.loadPricesComparision();
@@ -114,7 +113,7 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
             endDate.setDate(values[2]);
             endDate.setMonth(values[1]);
             endDate.setFullYear(values[0]);
-            return (endDate.getTime() - startDate.getTime()) / 60 / 60 / 24/1000;
+            return (endDate.getTime() - startDate.getTime()) / 60 / 60 / 24 / 1000;
         }
 
         map.prototype.initMap = function () {
@@ -194,12 +193,12 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
                 templateLoader.setFilename('prices-crude-oil-new.hbs');
                 templateLoader.setId('mainBlock');
                 templateLoader.addToTemplate(function () {
-                    if(typeof that.graphChart[data.key] === 'undefined' || that.graphChart[data.key] === null) {
+//                    if(typeof that.graphChart[data.key] === 'undefined' || that.graphChart[data.key] === null) {
 
-                        that.graphChart[data.key] = new GraphChart('diagramPrices' + data.key, "//infovis.ladyscript.ninja/comm/prices-gas-station.php?gasStationId=" + gasStationId + "&type=" + that.currentGasArt + "&startDate=" + that.startDate + "&endDate=" + that.endDate);
-                        that.graphChart[data.key].setAddPoints(getDiffBetweenDays(that.startDate, that.endDate) <= 3);
+                    that.graphChart[data.key] = new GraphChart('diagramPrices' + data.key, "//infovis.ladyscript.ninja/comm/prices-gas-station.php?gasStationId=" + gasStationId + "&type=" + that.currentGasArt + "&startDate=" + that.startDate + "&endDate=" + that.endDate);
+                    that.graphChart[data.key].setAddPoints(getDiffBetweenDays(that.startDate, that.endDate) <= 3);
 
-                    }
+                    //              }
 
                     that.graphChart[data.key].createDiagram(that.range, 'dateTime', data.key, function () {
                         $('#addToComparision' + data.key).click(function () {
@@ -230,31 +229,31 @@ define('map', ['jquery', 'leaflet','jqueryUI'], function ($) {
             });
         };
 
-    map.prototype.loadPricesComparision = function () {
-        var that = this;
-        var data = that.dataComparision;
-        var dataNames = that.dataComparisionName;
-        var loadTemplate = false;
-        data.forEach(function (value) {
-            if(value !== null) {
-                loadTemplate = true;
-                return false;
-            }
-        });
-        if(loadTemplate === false) {
-            $('#pricesComparisionBlock').empty();
-        } else {
-            require(['template-loader', 'graph-chart'], function (TemplateLoader, GraphChart) {
-                var templateLoader = new TemplateLoader();
-                templateLoader.setFilename('prices-comparision.hbs');
-                templateLoader.setId('pricesComparisionBlock');
-                templateLoader.loadTemplate(function () {
-                    that.graphChart[data.key] = new GraphChart('diagramPricesComparision');
-                    that.graphChart[data.key].createMultipleLineDiagram(data, dataNames, that.range, 'dateTime', 'loaderComparision');
-                }, data);
+        map.prototype.loadPricesComparision = function () {
+            var that = this;
+            var data = that.dataComparision;
+            var dataNames = that.dataComparisionName;
+            var loadTemplate = false;
+            data.forEach(function (value) {
+                if (value !== null) {
+                    loadTemplate = true;
+                    return false;
+                }
             });
-        }
-    };
+            if (loadTemplate === false) {
+                $('#pricesComparisionBlock').empty();
+            } else {
+                require(['template-loader', 'graph-chart'], function (TemplateLoader, GraphChart) {
+                    var templateLoader = new TemplateLoader();
+                    templateLoader.setFilename('prices-comparision.hbs');
+                    templateLoader.setId('pricesComparisionBlock');
+                    templateLoader.loadTemplate(function () {
+                        that.graphChart[data.key] = new GraphChart('diagramPricesComparision');
+                        that.graphChart[data.key].createMultipleLineDiagram(data, dataNames, that.range, 'dateTime', 'loaderComparision');
+                    }, data);
+                });
+            }
+        };
 
         return map;
     }
