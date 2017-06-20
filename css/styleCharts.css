@@ -58,9 +58,8 @@ svg .pumpkin {
 #mapViewBlock {
     width: 33%;
     float: left;
-    position: static;
-    position: sticky;
-    top: 200px;
+    position: fixed;
+    top: 196px;
 }
 
 #mainBlock, #pricesComparisionBlock {
